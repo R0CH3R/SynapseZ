@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="wrap">
+  <h2>{{ TITLE }}</h2>
+  <p class="lead">เพิ่มเพลงใหม่เข้าสู่ระบบแคตตาล็อก สามารถนำเข้าข้อมูลจาก YouTube หรือกรอกด้วยตนเอง</p>
+
+  <!-- นำเข้าข้อมูลจาก YouTube -->
+  <div class="panel" style="margin-bottom: 24px; background: #faf8f5;">
+    <h3 style="margin-top: 0; font-size: 16px;">นำเข้าข้อมูลจาก YouTube</h3>
+    <form method="GET" action="/page2" id="yt_import_form">
+      <div class="field">
+        <label for="yt_url">YouTube URL</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <input type="text" id="yt_url" name="yt_url" value="{{ yt_url }}" placeholder="https://www.youtube.com/watch?v=... หรือ https://youtu.be/..." style="flex: 1; min-width: 260px;" required>
+          <button type="submit" class="btn" style="white-space: nowrap;">Import from YouTube</button>
+        </div>
+        <small class="muted" style="display: block; margin-top: 6px;">
+          รองรับทุกลิงก์ YouTube (watch, youtu.be, shorts)
+        </small>
+      </div>
+    </form>
+  </div>
+
+  <!-- แสดงพรีวิวเมื่อนำเข้าจาก YouTube สำเร็จ -->
+  {% if imported %}
+  <div class="panel" style="margin-bottom: 24px; border: 1px solid var(--line); background: #fdfcfb;">
+    <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+      {% if imported.thumbnail_url %}
+      <img src="{{ imported.thumbnail_url }}" alt="Thumbnail" style="width: 140px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line);">
+      {% endif %}
+      <div style="flex: 1; min-width: 220px;">
+        <span class="badge good" style="margin-bottom: 6px;">นำเข้าข้อมูลสำเร็จ</span>
+        <div style="font-weight: 600; font-size: 16px; color: var(--maroon);">{{ imported.title }}</div>
+        <div class="muted" style="font-size: 13px; margin-top: 4px;">
+          ช่อง: {{ imported.youtube_channel }} · ปี: {{ imported.year }}
+        </div>
+        {% if imported.description %}
+        <div class="muted" style="font-size: 12px; margin-top: 4px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">
+          {{ imported.description }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ฟอร์มกรอกและแก้ไขข้อมูลเพลง -->
+  <div class="panel">
+    <h3 style="margin-top: 0; font-size: 16px;">ข้อมูลเพลง</h3>
+    <form method="POST">
+      <!-- เก็บข้อมูล metadata ของ YouTube ที่ซ่อนไว้ -->
+      <input type="hidden" name="source" value="{{ imported.source if imported else '' }}">
+      <input type="hidden" name="source_url" value="{{ imported.source_url if imported else '' }}">
+      <input type="hidden" name="youtube_video_id" value="{{ imported.youtube_video_id if imported else '' }}">
+      <input type="hidden" name="youtube_channel" value="{{ imported.youtube_channel if imported else '' }}">
+      <input type="hidden" name="thumbnail_url" value="{{ imported.thumbnail_url if imported else '' }}">
+      <input type="hidden" name="description" value="{{ imported.description if imported else '' }}">
+
+      <div class="field">
+        <label for="song_title">ชื่อเพลง (Title) *</label>
+        <input type="text" id="song_title" name="title" required value="{{ imported.title if imported else '' }}" placeholder="ระบุชื่อเพลง">
+      </div>
+
+      <div class="field">
+        <label for="song_artist">ศิลปิน (Artist) *</label>
+        <input type="text" id="song_artist" name="artist" required value="{{ imported.artist if imported else '' }}" placeholder="ระบุชื่อศิลปิน (สามารถแก้ไขได้หากชื่อช่องไม่ใช่ชื่อศิลปินจริง)">
+      </div>
+
+      <div class="field">
+        <label for="song_genre">แนวเพลง (Genre)</label>
+        <input type="text" id="song_genre" name="genre" value="{{ keep_genre if keep_genre else '' }}" placeholder="เช่น Pop, Rock, Hip-hop">
+      </div>
+
+      <div class="field">
+        <label for="song_year">ปีที่ออก (Year)</label>
+        <input type="number" id="song_year" name="year" value="{{ imported.year if imported else '2026' }}" placeholder="เช่น 2026" min="1900" max="2100">
+      </div>
+
+      <div class="field">
+        <label for="song_rating">คะแนนเรตติ้ง (Rating: 0.0 - 5.0)</label>
+        <input type="number" step="0.1" id="song_rating" name="rating" min="0" max="5" value="{{ keep_rating if keep_rating else '4.0' }}" placeholder="เช่น 4.5">
+      </div>
+
+      <div class="field">
+        <label for="song_plays">ยอดเล่น (Plays)</label>
+        <input type="number" id="song_plays" name="plays" min="0" value="{{ keep_plays if keep_plays else '0' }}" placeholder="เช่น 1500">
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 20px;">
+        <button type="submit" class="btn">บันทึกเพลงใหม่</button>
+        <a href="/page1" class="btn ghost">ดูรายการเพลงทั้งหมด</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ytForm = document.getElementById("yt_import_form");
+  if (!ytForm) return;
+
+  ytForm.addEventListener("submit", function() {
+    const genreInput = document.getElementById("song_genre");
+    const ratingInput = document.getElementById("song_rating");
+    const playsInput = document.getElementById("song_plays");
+
+    if (genreInput && genreInput.value) {
+      const g = document.createElement("input");
+      g.type = "hidden"; g.name = "keep_genre"; g.value = genreInput.value;
+      ytForm.appendChild(g);
+    }
+    if (ratingInput && ratingInput.value) {
+      const r = document.createElement("input");
+      r.type = "hidden"; r.name = "keep_rating"; r.value = ratingInput.value;
+      ytForm.appendChild(r);
+    }
+    if (playsInput && playsInput.value) {
+      const p = document.createElement("input");
+      p.type = "hidden"; p.name = "keep_plays"; p.value = playsInput.value;
+      ytForm.appendChild(p);
+    }
+  });
+});
+</script>
+{% endblock %}

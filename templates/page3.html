@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <h2>{{ TITLE }}</h2>
+  <p class="lead">สรุปสถิติภาพรวม ค่าเฉลี่ย และกราฟเปรียบเทียบข้อมูลเพลงทั้งหมดในระบบ</p>
+
+  <!-- กล่องแสดงตัวเลขสถิติภาพรวม (Stat Cards) -->
+  <div class="stat-grid" style="margin-bottom: 24px;">
+    <div class="stat">
+      <div class="label">จำนวนเพลงทั้งหมด</div>
+      <div class="value">{{ total_songs }} <span style="font-size: 14px; font-weight: normal; color: var(--muted);">เพลง</span></div>
+    </div>
+    <div class="stat">
+      <div class="label">ยอดฟังรวมทั้งหมด</div>
+      <div class="value">{{ total_plays }} <span style="font-size: 14px; font-weight: normal; color: var(--muted);">ครั้ง</span></div>
+    </div>
+    <div class="stat gold">
+      <div class="label">ค่าเฉลี่ยยอดฟังต่อเพลง</div>
+      <div class="value">{{ avg_plays }} <span style="font-size: 14px; font-weight: normal; color: var(--muted);">ครั้ง/เพลง</span></div>
+    </div>
+    <div class="stat">
+      <div class="label">ค่าเฉลี่ยเรตติ้งรวม</div>
+      <div class="value">{{ avg_rating }} <span style="font-size: 14px; font-weight: normal; color: var(--muted);">/ 5.0</span></div>
+    </div>
+  </div>
+
+  <!-- กราฟแท่งค่าเฉลี่ยเรตติ้งตามแนวเพลง -->
+  <h2>กราฟค่าเฉลี่ยคะแนนเรตติ้งตามแนวเพลง</h2>
+  <div class="panel" style="margin-bottom: 24px;">
+    <p class="muted" style="margin-top: 0; margin-bottom: 14px;">เปรียบเทียบคะแนนเรตติ้งเฉลี่ยในแต่ละแนวเพลง (คะแนนเต็ม 5.0)</p>
+    {% for b in genre_bars %}
+    <div class="bar-row" style="grid-template-columns: 140px 1fr 110px;">
+      <span style="font-weight: 500;">{{ b.genre }} <small class="muted">({{ b.count }} เพลง)</small></span>
+      <div class="bar-track">
+        <div class="bar-fill gold" style="width: {{ b.rating_percent }}%;"></div>
+      </div>
+      <span class="num">{{ b.avg_rating }} / 5.0</span>
+    </div>
+    {% else %}
+    <div class="empty">ยังไม่มีข้อมูลสำหรับสร้างกราฟ</div>
+    {% endfor %}
+  </div>
+
+  <!-- กราฟแท่งเปรียบเทียบยอดฟังเพลงแต่ละเพลงกับค่าเฉลี่ย -->
+  <h2>กราฟเปรียบเทียบยอดฟังของแต่ละเพลง</h2>
+  <div class="panel" style="margin-bottom: 24px;">
+    <p class="muted" style="margin-top: 0; margin-bottom: 14px;">เปรียบเทียบยอดฟังของแต่ละเพลง (แท่งสีเขียว = มียอดฟังสูงกว่าค่าเฉลี่ย {{ avg_plays }} ครั้ง)</p>
+    {% for sb in song_bars %}
+    <div class="bar-row" style="grid-template-columns: 180px 1fr 90px;">
+      <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ sb.title }}">
+        {{ sb.title }}
+      </span>
+      <div class="bar-track">
+        <div class="bar-fill {% if sb.is_above_avg %}green{% endif %}" style="width: {{ sb.percent }}%;"></div>
+      </div>
+      <span class="num">{{ sb.plays }}</span>
+    </div>
+    {% else %}
+    <div class="empty">ยังไม่มีข้อมูลเพลง</div>
+    {% endfor %}
+  </div>
+
+  <!-- ไฮไลต์เพลงคะแนนสูงสุด และยอดฟังสูงสุด -->
+  <h2>เพลงที่มีสถิติสูงสุด</h2>
+  <table style="margin-bottom: 28px;">
+    <thead>
+      <tr>
+        <th style="width: 140px;">ประเภทสถิติ</th>
+        <th>ชื่อเพลง</th>
+        <th>ศิลปิน</th>
+        <th>แนวเพลง</th>
+        <th class="num">สถิติ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if top_rated_song %}
+      <tr>
+        <td><span class="badge gold">เรตติ้งสูงสุด</span></td>
+        <td><strong>{{ top_rated_song.title }}</strong></td>
+        <td>{{ top_rated_song.artist }}</td>
+        <td>{{ top_rated_song.genre }}</td>
+        <td class="num">{{ top_rated_song.rating }} / 5.0</td>
+      </tr>
+      {% endif %}
+      {% if most_played_song %}
+      <tr>
+        <td><span class="badge good">ยอดฟังสูงสุด</span></td>
+        <td><strong>{{ most_played_song.title }}</strong></td>
+        <td>{{ most_played_song.artist }}</td>
+        <td>{{ most_played_song.genre }}</td>
+        <td class="num">{{ most_played_song.plays }} ครั้ง</td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  <!-- ตารางรายชื่อเพลงทั้งหมดในระบบ -->
+  <h2>รายชื่อเพลงทั้งหมดในระบบ</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 45px;">#</th>
+        <th>ชื่อเพลง (Title)</th>
+        <th>ศิลปิน (Artist)</th>
+        <th>แนวเพลง (Genre)</th>
+        <th>ปี (Year)</th>
+        <th>เรตติ้ง (Rating)</th>
+        <th class="num">ยอดฟัง (Plays)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for song in songs %}
+      <tr>
+        <td class="muted">{{ loop.index }}</td>
+        <td><strong>{{ song.title }}</strong></td>
+        <td>{{ song.artist }}</td>
+        <td>{{ song.genre }}</td>
+        <td>{{ song.year }}</td>
+        <td>{{ song.rating }}</td>
+        <td class="num">{{ song.plays }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" class="muted" style="text-align: center; padding: 24px;">ไม่พบข้อมูลเพลงในระบบ</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

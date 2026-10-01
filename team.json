@@ -1,0 +1,27 @@
+{
+  "group": {
+    "name": "SynapseZ"
+  },
+  "section": "06",
+  "topic": "เว็บไซต์รวบรวมข้อมูลเพลงจากศิลปินต่าง ๆ",
+  "members": [
+    {
+      "name": "นายณัฐพัทธ์ พันธ์อยู่",
+      "id": "69130840285",
+      "role": "Project Lead (PM) / Backend Dev",
+      "task": "page1 + PAGES.md"
+    },
+    {
+      "name": "ชนวีร์ บุญมานัด",
+      "id": "69130840021",
+      "role": "Frontend Dev (HTML/CSS)",
+      "task": "page2 + HTML/CSS"
+    },
+    {
+      "name": "นายเฉลิมศักดิ์ ทองให้",
+      "id": "69130840018",
+      "role": "Python/Data Dev",
+      "task": "page1 + data.json/models.py"
+    }
+  ]
+}

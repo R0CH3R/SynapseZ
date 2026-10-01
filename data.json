@@ -1,0 +1,82 @@
+[
+  {
+    "title": "พิง",
+    "artist": "นนท์ ธนนท์",
+    "genre": "Pop",
+    "year": 2020,
+    "rating": 4.8,
+    "plays": 1500
+  },
+  {
+    "title": "รักมักยาก",
+    "artist": "BUS",
+    "genre": "Pop",
+    "year": 2026,
+    "rating": 4.9,
+    "plays": 2500
+  },
+  {
+    "title": "ดีใจที่ไม่มีเธอ",
+    "artist": "BUS",
+    "genre": "Pop",
+    "year": 2026,
+    "rating": 4.8,
+    "plays": 2100
+  },
+  {
+    "title": "K",
+    "artist": "BUS",
+    "genre": "Pop",
+    "year": 2026,
+    "rating": 4.7,
+    "plays": 1800
+  },
+  {
+    "title": "chest voice",
+    "artist": "BUS",
+    "genre": "Pop",
+    "year": 2026,
+    "rating": 4.8,
+    "plays": 1900
+  },
+  {
+    "title": "แค่เธอ",
+    "artist": "Jeff Satur",
+    "genre": "Pop",
+    "year": 2022,
+    "rating": 4.9,
+    "plays": 3500
+  },
+  {
+    "title": "ซ่อนไม่หา",
+    "artist": "Jeff Satur",
+    "genre": "Pop",
+    "year": 2024,
+    "rating": 4.9,
+    "plays": 3200
+  },
+  {
+    "title": "ของขวัญ",
+    "artist": "The TOYS",
+    "genre": "Pop",
+    "year": 2019,
+    "rating": 4.8,
+    "plays": 2800
+  },
+  {
+    "title": "โต๊ะริม",
+    "artist": "นนท์ ธนนท์",
+    "genre": "Pop",
+    "year": 2022,
+    "rating": 4.7,
+    "plays": 1900
+  },
+  {
+    "title": "สลักจิต",
+    "artist": "ป๊อบ ปองกูล",
+    "genre": "Pop",
+    "year": 2022,
+    "rating": 4.8,
+    "plays": 1600
+  }
+]
